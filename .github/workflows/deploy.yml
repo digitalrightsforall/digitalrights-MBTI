@@ -3,7 +3,7 @@ name: Deploy to AliCloud ECS
 on:
   push:
     branches:
-      - main # 监听 main 分支的推送
+      - main
 
 jobs:
   build-and-deploy:
@@ -27,12 +27,18 @@ jobs:
           cd src/web-app
           npm run build
 
-      - name: Deploy to ECS via SSH
-        uses: easingthemes/ssh-deploy@main
-        env:
-          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
-          ARGS: "-rltgoDzvO --delete"
-          SOURCE: "src/web-app/out/"
-          REMOTE_HOST: ${{ secrets.REMOTE_HOST }}
-          REMOTE_USER: ${{ secrets.REMOTE_USER }}
-          TARGET: "/var/www/digital-rights-mbti"
+      - name: Deploy to ECS
+        run: |
+          # 1. 准备 SSH 目录
+          mkdir -p ~/.ssh
+          
+          # 2. 将私钥写入文件并确保格式（自动添加末尾换行符）
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+          sed -i '$a\' ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          
+          # 3. 执行同步 (使用标准 rsync)
+          rsync -avz --delete \
+            -e "ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa" \
+            src/web-app/out/ \
+            ${{ secrets.REMOTE_USER }}@${{ secrets.REMOTE_HOST }}:/var/www/digital-rights-mbti
