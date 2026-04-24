@@ -148,8 +148,8 @@ export default function Home() {
 
         {step === 'result' && (
           <div className="result-container" style={{ width: '100%', maxWidth: '480px', margin: '0 auto' }}>
-            <div style={{ textAlign: 'center', marginBottom: '1.2rem', color: 'var(--text-dim)', fontSize: '0.85rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', fontWeight: '600' }}>
-              <Camera size={14} /> 建议手动截图保存，分享你的数字灵魂
+            <div style={{ textAlign: 'center', marginBottom: '1.2rem', color: 'var(--text-dim)', fontSize: '0.85rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', fontWeight: '700' }}>
+              <Camera size={14} /> 📷 截图保存长图，分享你的数字灵魂
             </div>
 
             <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="card" style={{ padding: '0', overflow: 'hidden', border: '1px solid #e2e8f0', background: '#fff', borderRadius: '32px', boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.15)' }}>
