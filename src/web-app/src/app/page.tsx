@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import * as Icons from 'lucide-react';
 import { 
   Shield, Zap, Cpu, Activity, RefreshCcw, Heart, Users, Sparkles, 
-  Download, Camera
+  Download, Camera, Quote
 } from 'lucide-react';
 import { Radar, RadarChart, PolarGrid, PolarAngleAxis, ResponsiveContainer, Radar as RadarLine } from 'recharts';
 import questions from '@/data/questions.json';
@@ -55,7 +55,6 @@ export default function Home() {
   };
 
   const currentPersona = (personas as any)[resultCode];
-  const rarity = currentPersona?.rarity || 5.0;
 
   const radarData = dimensionScores['S/U'] !== undefined ? [
     { subject: '数据主权', A: dimensionScores['S/U'] },
@@ -64,13 +63,6 @@ export default function Home() {
     { subject: '能动行动', A: dimensionScores['P/R'] },
   ] : [];
 
-  const compatiblePersona = useMemo(() => {
-    if (!resultCode) return '';
-    const map: any = {S:'U', U:'S', C:'O', O:'C', M:'D', D:'M', P:'R', R:'P'};
-    const opposite = resultCode.split('').map(c => map[c]).join('');
-    return (personas as any)[opposite]?.name || '数字流浪者';
-  }, [resultCode]);
-
   const resetTest = () => {
     setStep('landing');
     setCurrentQ(0);
@@ -78,7 +70,7 @@ export default function Home() {
   };
 
   const handleShareWeibo = () => {
-    const title = `我在 2026 AI 时代测出的数字人格是：#${currentPersona?.name}#！全球仅 ${rarity}% 的人拥有此性格。你也来测测你的数字灵魂吧！`;
+    const title = `我在 2026 AI 时代测出的数字人格是：#${currentPersona?.name}#！你也来测测你的数字灵魂吧！`;
     const url = "http://139.196.224.188";
     window.open(`http://service.weibo.com/share/share.php?url=${encodeURIComponent(url)}&title=${encodeURIComponent(title)}`, '_blank');
   };
@@ -101,7 +93,7 @@ export default function Home() {
                   </motion.div>
                 </div>
               </div>
-              <h1 style={{ fontSize: '2.5rem', fontWeight: '900', marginBottom: '0.8rem', color: 'var(--foreground)', letterSpacing: '-1.5px' }}>
+              <h1 style={{ fontSize: '2.5rem', fontWeight: '900', marginBottom: '0.8rem', color: 'var(--foreground)', letterSpacing: '-1px' }}>
                 数字灵魂 <span style={{ color: 'var(--primary)' }}>MBTI</span>
               </h1>
               <p style={{ color: 'var(--text-dim)', fontSize: '1.2rem', marginBottom: '2rem', fontWeight: '500', lineHeight: '1.6' }}>
@@ -154,8 +146,9 @@ export default function Home() {
 
             <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="card" style={{ padding: '0', overflow: 'hidden', border: '1px solid #e2e8f0', background: '#fff', borderRadius: '32px', boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.15)' }}>
               <div style={{ background: currentPersona?.theme_color || 'var(--primary)', padding: '2.5rem 1.5rem', textAlign: 'center', color: '#fff' }}>
-                <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '0.4rem 1rem', background: 'rgba(0,0,0,0.15)', borderRadius: '99px', fontSize: '0.75rem', fontWeight: '800', marginBottom: '1.5rem' }}>
-                  <Users size={12} /> 全球稀有度 {rarity}%
+                {/* 人格代码移至顶部 */}
+                <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '0.4rem 1rem', background: 'rgba(0,0,0,0.15)', borderRadius: '99px', fontSize: '0.75rem', fontWeight: '800', marginBottom: '1.5rem', letterSpacing: '1px' }}>
+                  TYPE ARCHIVE: {resultCode}
                 </div>
                 <PersonaAvatar code={resultCode} color="#ffffff" />
                 <h1 style={{ fontSize: '2.8rem', fontWeight: '900', margin: '1rem 0 0.5rem 0', letterSpacing: '-1.5px' }}>
@@ -175,7 +168,21 @@ export default function Home() {
                   ))}
                 </div>
 
-                <div style={{ height: '240px', marginBottom: '1.5rem' }}>
+                {/* 1. 深度叙事区域 (调整至雷达图之前) */}
+                <div style={{ padding: '1.5rem', background: 'linear-gradient(180deg, #f8fafc 0%, #fff 100%)', borderRadius: '24px', border: '1px solid #f1f5f9', marginBottom: '2rem', position: 'relative' }}>
+                   <div style={{ position: 'absolute', top: '-10px', left: '20px', background: currentPersona?.theme_color, padding: '4px', borderRadius: '50%' }}>
+                      <Quote size={14} color="#fff" />
+                   </div>
+                   <h3 style={{ fontSize: '1rem', fontWeight: '900', marginBottom: '1rem', color: currentPersona?.theme_color, display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      数字灵魂深度解析
+                   </h3>
+                   <p style={{ color: '#475569', fontSize: '0.95rem', lineHeight: '1.8', textAlign: 'justify' }}>
+                      {currentPersona?.narrative}
+                   </p>
+                </div>
+
+                {/* 2. 雷达图展示 */}
+                <div style={{ height: '240px', marginBottom: '2.5rem' }}>
                   <ResponsiveContainer width="100%" height="100%">
                     <RadarChart cx="50%" cy="50%" outerRadius="80%" data={radarData}>
                       <PolarGrid stroke="#f1f5f9" />
@@ -185,33 +192,16 @@ export default function Home() {
                   </ResponsiveContainer>
                 </div>
 
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '2.5rem' }}>
-                  <div style={{ background: '#f8fafc', padding: '1rem', borderRadius: '20px', textAlign: 'center', border: '1px solid #f1f5f9' }}>
-                    <div style={{ fontSize: '0.7rem', color: '#94a3b8', fontWeight: '800', marginBottom: '0.4rem' }}>契合灵魂</div>
-                    <div style={{ fontWeight: '900', color: '#1e293b', fontSize: '0.9rem' }}>{compatiblePersona}</div>
-                  </div>
-                  <div style={{ background: '#f8fafc', padding: '1rem', borderRadius: '20px', textAlign: 'center', border: '1px solid #f1f5f9' }}>
-                    <div style={{ fontSize: '0.7rem', color: '#94a3b8', fontWeight: '800', marginBottom: '0.4rem' }}>人格代码</div>
-                    <div style={{ fontWeight: '900', color: '#1e293b', fontSize: '0.9rem' }}>{resultCode}</div>
-                  </div>
-                </div>
-
-                <div style={{ display: 'grid', gap: '1.2rem', marginBottom: '3rem' }}>
-                  <div style={{ padding: '1.2rem', background: '#fff', borderRadius: '24px', border: '1px solid #f1f5f9' }}>
-                    <h3 style={{ fontSize: '1rem', fontWeight: '900', marginBottom: '0.8rem', display: 'flex', alignItems: 'center', gap: '8px', color: '#1e293b' }}>
-                      <DynamicIcon name="Cpu" size={18} color={currentPersona?.theme_color} /> 深度画像
-                    </h3>
-                    <p style={{ color: '#475569', fontSize: '0.9rem', lineHeight: '1.7' }}>{currentPersona?.desc}</p>
-                  </div>
-                  <div style={{ padding: '1.2rem', background: 'rgba(34, 197, 94, 0.04)', borderRadius: '24px', border: '1px solid rgba(34, 197, 94, 0.1)' }}>
+                <div style={{ display: 'grid', gap: '1rem', marginBottom: '3rem' }}>
+                  <div style={{ padding: '1.2rem', background: 'rgba(34, 197, 94, 0.03)', borderRadius: '24px', border: '1px solid rgba(34, 197, 94, 0.1)' }}>
                     <h3 style={{ fontSize: '1rem', fontWeight: '900', marginBottom: '0.8rem', color: 'var(--success)', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                      <Heart size={18} /> 生存指南
+                      <Heart size={18} /> 数字生存指南
                     </h3>
                     <p style={{ color: '#1e293b', fontSize: '0.9rem', lineHeight: '1.7' }}>{currentPersona?.advice}</p>
                   </div>
                 </div>
 
-                {/* 品牌底部印章 - 修复错位问题 */}
+                {/* 品牌底部印章 */}
                 <div style={{ borderTop: '2px dashed #f1f5f9', paddingTop: '2.5rem', paddingBottom: '1rem', textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '0.8rem' }}>
                     <Shield size={24} color="var(--primary)" />
