@@ -1,0 +1,35 @@
+.totem-container {
+  width: 360rpx;
+  height: 360rpx;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+.totem-svg {
+  width: 100%;
+  height: 100%;
+}
+
+@keyframes rotate-linear {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes rotate-reverse {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(-360deg); }
+}
+
+@keyframes pulse-scale {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.2); }
+  100% { transform: scale(1); }
+}
+
+.ani-rotate { animation: rotate-linear 10s linear infinite; }
+.ani-rotate-fast { animation: rotate-linear 4s linear infinite; }
+.ani-rotate-reverse { animation: rotate-reverse 8s linear infinite; }
+.ani-pulse { animation: pulse-scale 2s ease-in-out infinite; }

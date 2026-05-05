@@ -1,8 +1,9 @@
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import { View, Text, Button, Progress, Canvas } from '@tarojs/components'
 import Taro, { useShareAppMessage, useShareTimeline } from '@tarojs/taro'
 import questions from '../../data/questions.json'
 import personas from '../../data/personas.json'
+import { PersonaTotem } from '../../components/PersonaTotem'
 import './index.scss'
 
 export default function Index() {
@@ -10,19 +11,26 @@ export default function Index() {
   const [currentQ, setCurrentQ] = useState(0)
   const [answers, setAnswers] = useState<Record<number, 'A' | 'B'>>({})
   const [resultCode, setResultCode] = useState('')
+  const [dimensionScores, setDimensionScores] = useState<Record<string, number>>({})
   const [isDrawing, setIsDrawing] = useState(false)
 
-  // Share with friends
-  useShareAppMessage(() => ({
-    title: '2026 AI 时代：你是驯服算法的大师，还是被看光的透明人？',
-    path: '/pages/index/index'
-  }))
+  // 分享给好友
+  useShareAppMessage(() => {
+    const persona = (personas as any)[resultCode]
+    return {
+      title: step === 'result' ? `我的数字灵魂是：#${persona?.name}#！全球仅 ${persona?.rarity}% 的人拥有此性格。` : '2026 AI 时代：你是驯服算法的大师，还是被看光的透明人？',
+      path: '/pages/index/index'
+    }
+  })
 
-  // Share to Timeline
-  useShareTimeline(() => ({
-    title: '数字灵魂 MBTI 评测：开启你的数字性格档案',
-    query: ''
-  }))
+  // 分享到朋友圈
+  useShareTimeline(() => {
+    const persona = (personas as any)[resultCode]
+    return {
+      title: step === 'result' ? `数字灵魂 MBTI：我是[${persona?.name}]，稀有度 ${persona?.rarity}%` : '数字灵魂 MBTI 评测',
+      query: ''
+    }
+  })
 
   const handleAnswer = (choice: 'A' | 'B') => {
     const newAnswers = { ...answers, [currentQ]: choice }
@@ -50,6 +58,7 @@ export default function Index() {
       percentages[dim] = Math.round((scores[dim] / maxPossible[dim]) * 100)
     })
     
+    setDimensionScores(percentages)
     const code = [
       percentages['S/U'] >= 50 ? 'S' : 'U',
       percentages['C/O'] >= 50 ? 'C' : 'O',
@@ -59,10 +68,14 @@ export default function Index() {
     
     setResultCode(code)
     setStep('result')
+    Taro.pageScrollTo({ scrollTop: 0, duration: 300 })
   }
+
+  const currentPersona = (personas as any)[resultCode]
 
   // --- Canvas 海报生成逻辑 ---
   const drawPoster = async () => {
+    if (isDrawing) return
     setIsDrawing(true)
     Taro.showLoading({ title: '正在生成海报...' })
 
@@ -72,81 +85,90 @@ export default function Index() {
 
       // 1. 绘制背景
       ctx.setFillStyle('#ffffff')
-      ctx.fillRect(0, 0, 300, 500)
+      ctx.fillRect(0, 0, 300, 600)
 
       // 2. 绘制顶部色块
       ctx.setFillStyle(persona.theme_color || '#fb923c')
-      ctx.fillRect(0, 0, 300, 150)
+      ctx.fillRect(0, 0, 300, 180)
 
-      // 3. 绘制文字 - 人格名称
-      ctx.setFontSize(28)
+      // 3. 绘制稀有度
+      ctx.setFontSize(10)
+      ctx.setFillStyle('rgba(0,0,0,0.2)')
+      ctx.fillRect(100, 20, 100, 20)
       ctx.setFillStyle('#ffffff')
       ctx.setTextAlign('center')
-      ctx.fillText(persona.name, 150, 80)
+      ctx.fillText(`全球稀有度 ${persona.rarity}%`, 150, 34)
 
-      // 4. 绘制代码
-      ctx.setFontSize(16)
-      ctx.setGlobalAlpha(0.8)
-      ctx.fillText(`TYPE: ${resultCode}`, 150, 110)
-      ctx.setGlobalAlpha(1.0)
+      // 4. 绘制人格名称
+      ctx.setFontSize(26)
+      ctx.fillText(persona.name, 150, 100)
 
       // 5. 绘制口号
       ctx.setFontSize(14)
+      ctx.setGlobalAlpha(0.9)
+      ctx.fillText(persona.slogan, 150, 135)
+      ctx.setGlobalAlpha(1.0)
+
+      // 6. 绘制分割线与内容
       ctx.setFillStyle('#333333')
-      ctx.fillText(`“ ${persona.slogan} ”`, 150, 200)
-
-      // 6. 绘制描述 (简易换行处理)
-      ctx.setFontSize(12)
+      ctx.setFontSize(14)
+      ctx.fillText('数字图腾解析', 150, 220)
+      
+      // 换行绘制解读
+      ctx.setFontSize(11)
       ctx.setFillStyle('#666666')
-      const desc = persona.desc.length > 40 ? persona.desc.substring(0, 37) + '...' : persona.desc
-      ctx.fillText(desc, 150, 240)
+      const interpretation = persona.interpretation
+      const lines = interpretation.length > 20 ? [interpretation.slice(0, 20), interpretation.slice(20, 40)] : [interpretation]
+      lines.forEach((line, i) => ctx.fillText(line, 150, 250 + i * 18))
 
-      // 7. 绘制底部品牌印章
-      ctx.setStrokeStyle('#eeeeee')
+      // 7. 绘制深度画像标题
+      ctx.setFillStyle(persona.theme_color)
+      ctx.setFontSize(14)
+      ctx.fillText('深度画像', 150, 320)
+      
+      // 换行绘制描述
+      ctx.setFontSize(10)
+      ctx.setFillStyle('#444444')
+      const desc = persona.desc
+      const descLines = [desc.slice(0, 25), desc.slice(25, 50), desc.slice(50, 75)]
+      descLines.forEach((line, i) => ctx.fillText(line, 150, 350 + i * 16))
+
+      // 8. 绘制底部品牌
+      ctx.setStrokeStyle('#f1f5f9')
       ctx.setLineDash([5, 5])
-      ctx.moveTo(30, 400)
-      ctx.lineTo(270, 400)
+      ctx.moveTo(30, 480)
+      ctx.lineTo(270, 480)
       ctx.stroke()
 
-      ctx.setFontSize(14)
-      ctx.setFillStyle('#333333')
-      ctx.fillText('普通人的数字权利', 150, 440)
+      ctx.setFontSize(15)
+      ctx.setFillStyle('#1e293b')
+      ctx.fillText('普通人的数字权利', 150, 520)
       
-      ctx.setFontSize(10)
-      ctx.setFillStyle('#999999')
-      ctx.fillText('提升数字素养 · 捍卫数字权利', 150, 460)
+      ctx.setFontSize(9)
+      ctx.setFillStyle('#94a3b8')
+      ctx.fillText('提升全民科技伦理素养 · 捍卫数字权利', 150, 545)
+      ctx.fillText('—— 搜索「普通人的数字权利」开启测评 ——', 150, 575)
 
-      // 8. 渲染到 Canvas
+      // 渲染
       ctx.draw(false, () => {
-        // 9. 导出为图片
         Taro.canvasToTempFilePath({
           canvasId: 'posterCanvas',
           success: (res) => {
             Taro.hideLoading()
-            // 10. 保存到相册
             Taro.saveImageToPhotosAlbum({
               filePath: res.tempFilePath,
-              success: () => {
-                Taro.showToast({ title: '已保存到相册，快去分享吧！', icon: 'success' })
-              },
-              fail: () => {
-                Taro.showModal({
-                  title: '保存失败',
-                  content: '请检查是否授权相册访问权限',
-                  showCancel: false
-                })
-              }
+              success: () => Taro.showToast({ title: '已存入相册', icon: 'success' }),
+              fail: () => Taro.showModal({ title: '保存失败', content: '请授权相册访问权限', showCancel: false })
             })
           },
           fail: () => {
             Taro.hideLoading()
-            Taro.showToast({ title: '生成失败', icon: 'error' })
+            Taro.showToast({ title: '生成失败', icon: 'none' })
           }
         })
       })
     } catch (err) {
       Taro.hideLoading()
-      console.error(err)
     } finally {
       setIsDrawing(false)
     }
@@ -160,15 +182,17 @@ export default function Index() {
 
   return (
     <View className='container'>
-      {/* 隐藏的 Canvas 仅用于生成图片 */}
-      <Canvas canvasId='posterCanvas' style={{ width: '300px', height: '500px', position: 'absolute', left: '-1000px', top: '-1000px' }} />
+      <Canvas canvasId='posterCanvas' style={{ width: '300px', height: '600px', position: 'absolute', left: '-1000px', top: '-1000px' }} />
 
       {step === 'landing' && (
         <View className='landing'>
+          <View className='logo-box'>
+             <View className='logo-icon' />
+          </View>
           <View className='title'>数字灵魂 MBTI</View>
           <Text className='subtitle'>2026 AI 时代：你是哪种数字公民？</Text>
           <Button className='btn-start' onClick={() => setStep('test')}>开启我的档案</Button>
-          <View className='brand-footer'>出品：普通人的数字权利</View>
+          <View className='brand-footer'>出品：普通人的数字权利社区</View>
         </View>
       )}
 
@@ -188,23 +212,46 @@ export default function Index() {
 
       {step === 'result' && (
         <View className='result'>
-          <View className='header-card' style={{ backgroundColor: (personas as any)[resultCode]?.theme_color }}>
-             <Text className='res-code'>{resultCode}</Text>
-             <Text className='res-name'>{(personas as any)[resultCode]?.name}</Text>
-          </View>
-          <View className='content-body'>
-            <Text className='res-slogan'>“ {(personas as any)[resultCode]?.slogan} ”</Text>
-            <View className='res-desc'>{(personas as any)[resultCode]?.desc}</View>
-            
-            <View className='actions'>
-              <Button className='btn-save' onClick={drawPoster} disabled={isDrawing}>保存结果海报</Button>
-              <Button className='btn-reset' onClick={resetTest}>重新测试</Button>
+          <View className='result-card-outer'>
+            <View className='result-header' style={{ backgroundColor: currentPersona?.theme_color }}>
+              <View className='rarity-tag'>全球稀有度 {currentPersona?.rarity}%</View>
+              <View className='totem-container'>
+                <PersonaTotem code={resultCode} color="#ffffff" />
+              </View>
+              <View className='res-name'>{currentPersona?.name}</View>
+              <View className='res-slogan'>{currentPersona?.slogan}</View>
             </View>
 
-            <View className='about-box'>
-              <Text className='about-title'>关于：普通人的数字权利</Text>
-              <Text className='about-text'>提升全民科技伦理素养，为普通人提供数字权益发声平台。</Text>
+            <View className='result-body'>
+              <View className='tags-row'>
+                {currentPersona?.tags?.map(tag => <Text key={tag} className='tag' style={{ color: currentPersona?.theme_color }}>{tag}</Text>)}
+              </View>
+
+              <View className='section'>
+                <View className='section-title' style={{ color: currentPersona?.theme_color }}>数字图腾解析</View>
+                <View className='section-content'>{currentPersona?.interpretation}</View>
+              </View>
+
+              <View className='section'>
+                <View className='section-title' style={{ color: currentPersona?.theme_color }}>深度画像</View>
+                <View className='section-content'>{currentPersona?.desc}</View>
+              </View>
+
+              <View className='section survival'>
+                <View className='section-title'>生存指南</View>
+                <View className='section-content'>{currentPersona?.advice}</View>
+              </View>
+
+              <View className='brand-seal'>
+                <View className='seal-name'>普通人的数字权利</View>
+                <View className='seal-desc'>提升全民科技伦理素养，捍卫数字权利</View>
+              </View>
             </View>
+          </View>
+          
+          <View className='footer-actions'>
+            <Button className='btn-save' onClick={drawPoster} disabled={isDrawing}>保存海报分享</Button>
+            <Button className='btn-reset' onClick={resetTest}>重新测试</Button>
           </View>
         </View>
       )}
