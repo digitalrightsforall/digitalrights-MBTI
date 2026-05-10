@@ -1,10 +1,10 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import * as Icons from 'lucide-react';
-import { 
-  Shield, Zap, Cpu, Activity, RefreshCcw, Heart, Users, Sparkles, 
+import {
+  Shield, Zap, Cpu, Activity, RefreshCcw, Heart, Users, Sparkles,
   Download, Camera, Quote
 } from 'lucide-react';
 import { Radar, RadarChart, PolarGrid, PolarAngleAxis, ResponsiveContainer, Radar as RadarLine } from 'recharts';
@@ -17,16 +17,49 @@ const DynamicIcon = ({ name, size = 24, color = "currentColor" }: { name: string
   return <IconComponent size={size} color={color} />;
 };
 
+function generateParticipantId(): string {
+  return 'web_' + Date.now().toString(36) + Math.random().toString(36).substring(2, 8);
+}
+
+async function logToLark(data: Record<string, string>) {
+  try {
+    await fetch('/api/lark-submit', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data),
+    });
+  } catch (err) {
+    console.error('埋点上报失败:', err);
+  }
+}
+
 export default function Home() {
   const [step, setStep] = useState<'landing' | 'test' | 'result'>('landing');
   const [currentQ, setCurrentQ] = useState(0);
   const [answers, setAnswers] = useState<Record<number, 'A' | 'B'>>({});
   const [resultCode, setResultCode] = useState('');
   const [dimensionScores, setDimensionScores] = useState<Record<string, number>>({});
+  const [participantId, setParticipantId] = useState<string>('');
+
+  useEffect(() => {
+    let pid = localStorage.getItem('mbti_participant_id');
+    if (!pid) {
+      pid = generateParticipantId();
+      localStorage.setItem('mbti_participant_id', pid);
+    }
+    setParticipantId(pid);
+    // 用户首次访问即上报
+    logToLark({
+      参与者标识: pid,
+      来源平台: 'web',
+      完成状态: '访问',
+    });
+  }, []);
 
   const handleAnswer = (choice: 'A' | 'B') => {
     const newAnswers = { ...answers, [currentQ]: choice };
     setAnswers(newAnswers);
+
     if (currentQ < questions.length - 1) {
       setCurrentQ(currentQ + 1);
     } else {
@@ -50,8 +83,25 @@ export default function Home() {
     setDimensionScores(percentages);
     const code = [percentages['S/U'] >= 50 ? 'S' : 'U', percentages['C/O'] >= 50 ? 'C' : 'O', percentages['M/D'] >= 50 ? 'M' : 'D', percentages['P/R'] >= 50 ? 'P' : 'R'].join('');
     setResultCode(code);
+
+    logToLark({
+      参与者标识: participantId,
+      来源平台: 'web',
+      完成状态: '完成',
+      MBTI结果: code,
+    });
+
     setStep('result');
     window.scrollTo(0, 0);
+  };
+
+  const handleStartTest = () => {
+    logToLark({
+      参与者标识: participantId,
+      来源平台: 'web',
+      完成状态: '点击',
+    });
+    setStep('test');
   };
 
   const currentPersona = (personas as any)[resultCode];
@@ -102,7 +152,7 @@ export default function Home() {
             </div>
 
             <div>
-              <button className="btn" onClick={() => setStep('test')} style={{ width: '100%', fontSize: '1.25rem', padding: '1.3rem', marginBottom: '1.5rem' }}>
+              <button className="btn" onClick={handleStartTest} style={{ width: '100%', fontSize: '1.25rem', padding: '1.3rem', marginBottom: '1.5rem' }}>
                 开启我的性格档案
               </button>
               <div style={{ color: 'var(--text-dim)', fontSize: '0.85rem', fontWeight: '700', borderTop: '1px solid #f1f5f9', paddingTop: '1.2rem' }}>
