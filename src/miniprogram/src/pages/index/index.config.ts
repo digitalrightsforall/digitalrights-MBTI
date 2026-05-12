@@ -1,5 +1,5 @@
 export default definePageConfig({
-  navigationBarTitleText: '数字灵魂 MBTI',
+  navigationBarTitleText: '数字公民人格 MBTI',
   enableShareAppMessage: true,
   enableShareTimeline: true
 })

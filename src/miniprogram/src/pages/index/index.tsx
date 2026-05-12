@@ -20,7 +20,7 @@ export default function Index() {
 
   // Share to Timeline
   useShareTimeline(() => ({
-    title: '数字灵魂 MBTI 评测：开启你的数字性格档案',
+    title: '数字公民人格 MBTI 评测：开启你的数字性格档案',
     query: ''
   }))
 
@@ -165,7 +165,7 @@ export default function Index() {
 
       {step === 'landing' && (
         <View className='landing'>
-          <View className='title'>数字灵魂 MBTI</View>
+          <View className='title'>数字公民人格 MBTI</View>
           <Text className='subtitle'>2026 AI 时代：你是哪种数字公民？</Text>
           <Button className='btn-start' onClick={() => setStep('test')}>开启我的档案</Button>
           <View className='brand-footer'>出品：普通人的数字权利</View>

@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="zh-CN"
+  data-composition-variables='[
+    {"id":"title","type":"string","label":"Title","default":"数字公民人格 MBTI"}
+  ]'
+>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>数字公民人格 MBTI · Vertical Promo</title>
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --bg: #0a0a1a;
+  --fg: #f1f5f9;
+  --accent: #fb923c;
+  --accent-light: #fbbf24;
+  --accent-deep: #ea580c;
+  --muted: #94a3b8;
+  --dim: #475569;
+}
+
+body {
+  background: var(--bg);
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  overflow: hidden;
+}
+
+/* ====== Composition Root ====== */
+#promo-v {
+  position: relative;
+  width: 1080px;
+  height: 1920px;
+  overflow: hidden;
+  background: var(--bg);
+}
+
+/* ====== Scene Base ====== */
+.scene {
+  position: absolute;
+  top: 0; left: 0;
+  width: 1080px;
+  height: 1920px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 80px 60px;
+  box-sizing: border-box;
+}
+
+.scene-content {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 32px;
+  position: relative;
+  z-index: 2;
+}
+
+/* ====== Background Layers ====== */
+.bg-layer {
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.radial-glow {
+  position: absolute;
+  border-radius: 50%;
+  pointer-events: none;
+  filter: blur(80px);
+}
+
+.radial-glow.g1 {
+  width: 600px; height: 600px;
+  top: 15%; left: -10%;
+  background: radial-gradient(circle, rgba(251,146,60,0.15) 0%, transparent 70%);
+}
+
+.radial-glow.g2 {
+  width: 500px; height: 500px;
+  bottom: 10%; right: -10%;
+  background: radial-gradient(circle, rgba(56,189,248,0.1) 0%, transparent 70%);
+}
+
+/* ====== Grid overlay ====== */
+.grid-overlay {
+  position: absolute;
+  top: 0; left: 0;
+  width: 1080px; height: 1920px;
+  background-image:
+    linear-gradient(rgba(251,146,60,0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(251,146,60,0.03) 1px, transparent 1px);
+  background-size: 60px 60px;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ====== Ghost text (Vertical) ====== */
+.ghost-text {
+  position: absolute;
+  font-size: 180px;
+  font-weight: 900;
+  color: rgba(251,146,60,0.03);
+  pointer-events: none;
+  letter-spacing: -4px;
+  white-space: nowrap;
+  writing-mode: vertical-rl;
+}
+
+.ghost-text.gt1 {
+  top: 100px; right: 40px;
+}
+.ghost-text.gt2 {
+  bottom: 100px; left: 40px;
+}
+
+/* ====== Typography ====== */
+.hero-title {
+  font-size: 110px;
+  font-weight: 900;
+  line-height: 1.1;
+  letter-spacing: -3px;
+  color: var(--fg);
+}
+
+.hero-title .num {
+  color: var(--accent);
+}
+
+.tagline {
+  font-size: 48px;
+  font-weight: 700;
+  line-height: 1.4;
+  color: var(--muted);
+}
+
+.accent-line {
+  width: 80px;
+  height: 6px;
+  background: var(--accent);
+  border-radius: 4px;
+}
+
+/* ====== Dimension cards (Vertical Stacking) ====== */
+.dim-list {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  width: 100%;
+}
+
+.dim-card {
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: 20px;
+  padding: 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.dim-card .dim-dot {
+  width: 12px; height: 12px;
+  border-radius: 50%;
+}
+
+.dim-card h4 {
+  font-size: 32px;
+  font-weight: 800;
+  color: var(--fg);
+}
+
+.dim-card .dim-code {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--dim);
+  letter-spacing: 2px;
+}
+
+.dim-card p {
+  font-size: 24px;
+  font-weight: 500;
+  color: var(--muted);
+  line-height: 1.4;
+}
+
+/* ====== Persona Flicker (Single Card) ====== */
+.persona-container {
+  position: relative;
+  width: 100%;
+  height: 400px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.persona-big-card {
+  position: absolute;
+  background: rgba(255,255,255,0.05);
+  border: 2px solid var(--accent);
+  border-radius: 32px;
+  padding: 60px;
+  width: 800px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 24px;
+  text-align: center;
+  opacity: 0;
+  transform: scale(0.8);
+  box-shadow: 0 0 50px rgba(251,146,60,0.1);
+}
+
+.persona-big-card .p-dot {
+  width: 24px; height: 24px;
+  border-radius: 50%;
+  background: var(--accent);
+}
+
+.persona-big-card .p-name {
+  font-size: 72px;
+  font-weight: 900;
+  color: var(--fg);
+  letter-spacing: 2px;
+}
+
+.persona-big-card .p-code {
+  font-size: 32px;
+  font-weight: 800;
+  color: var(--accent);
+  letter-spacing: 6px;
+  opacity: 0.6;
+}
+
+/* Question mark specific style */
+.persona-big-card.is-question .p-name {
+  font-size: 140px;
+  color: var(--accent);
+}
+
+/* ====== CTA ====== */
+.cta-title {
+  font-size: 100px;
+  font-weight: 900;
+  line-height: 1.1;
+  letter-spacing: -2px;
+  color: var(--fg);
+}
+
+.cta-sub {
+  font-size: 42px;
+  font-weight: 700;
+  color: var(--muted);
+  line-height: 1.4;
+}
+
+.url-box {
+  margin-top: 50px;
+  padding: 24px 60px;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 100px;
+  color: var(--muted);
+  font-size: 48px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.cta-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 16px;
+  margin-top: 60px;
+  padding: 24px 60px;
+  background: var(--accent);
+  border: none;
+  border-radius: 24px;
+  color: #fff;
+  font-size: 42px;
+  font-weight: 800;
+  box-shadow: 0 15px 40px rgba(251,146,60,0.3);
+}
+
+.brand-line {
+  font-size: 32px;
+  font-weight: 600;
+  color: var(--dim);
+  margin-top: 60px;
+}
+.brand-line span { color: var(--accent); }
+
+</style>
+</head>
+<body>
+
+<div data-composition-id="promo-v" id="promo-v" data-width="1080" data-height="1920" data-start="0" data-duration="14">
+
+  <!-- ====== Shared Background ====== -->
+  <div class="bg-layer">
+    <div class="radial-glow g1"></div>
+    <div class="radial-glow g2"></div>
+  </div>
+  <div class="grid-overlay"></div>
+  <div class="ghost-text gt1">DIGITAL RIGHTS</div>
+  <div class="ghost-text gt2">MBTI</div>
+
+  <!-- ====== SCENE 1: Hook (Centered) ====== -->
+  <div id="s1" class="scene" style="align-items: center; text-align: center;">
+    <div class="scene-content" id="s1-content" style="align-items: center;">
+      <div class="accent-line" id="s1-line"></div>
+      <h1 class="hero-title" id="s1-title" style="font-size: 120px;">
+        2026<br/><span class="num">AI</span> 时代
+      </h1>
+      <p class="tagline" id="s1-tagline" style="font-size: 52px;">
+        你是驯服算法的大师，<br/>还是被看光的透明人？
+      </p>
+      <div style="margin-top:50px; display:flex; gap:20px; align-items:center;">
+        <div style="width:18px;height:18px;border-radius:50%;background:var(--accent);" id="s1-dot1"></div>
+        <div style="font-size:32px;font-weight:600;color:var(--dim);" id="s1-subtitle">
+          普通人的数字权利 · 公益出品
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ====== SCENE 2: DNA ====== -->
+  <div id="s2" class="scene">
+    <div class="scene-content" id="s2-content">
+      <div id="s2-label" style="font-size:20px;font-weight:800;color:var(--accent);letter-spacing:4px;">解构数字生存</div>
+      <h1 class="hero-title" id="s2-heading" style="font-size:72px;">
+        在算法黑盒前，<br/>你如何<span class="num">抉择</span>？
+      </h1>
+      <div class="dim-list" id="s2-list">
+        <div class="dim-card" id="s2-d1">
+          <div class="dim-dot" style="background:#fb923c;"></div>
+          <h4>主权 vs 效用</h4>
+          <p>你会为了极致便利，彻底让渡控制权吗？</p>
+        </div>
+        <div class="dim-card" id="s2-d2">
+          <div class="dim-dot" style="background:#38bdf8;"></div>
+          <h4>审慎 vs 乐观</h4>
+          <p>你选择拆解算法逻辑，还是无条件信任？</p>
+        </div>
+        <div class="dim-card" id="s2-d3">
+          <div class="dim-dot" style="background:#a855f7;"></div>
+          <h4>掌控 vs 让渡</h4>
+          <p>你倾向亲手操盘，还是交给智能代理？</p>
+        </div>
+        <div class="dim-card" id="s2-d4">
+          <div class="dim-dot" style="background:#22c55e;"></div>
+          <h4>积极 vs 响应</h4>
+          <p>你会主动设置边界，还是被动接受默认？</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ====== SCENE 3: Personas (Flicker Mode) ====== -->
+  <div id="s3" class="scene" style="align-items: center; text-align: center;">
+    <div class="scene-content" style="align-items: center; gap: 48px;">
+      <div id="s3-label" style="font-size:24px;font-weight:800;color:var(--accent);letter-spacing:6px;">数字公民人格匹配中...</div>
+      <h1 class="hero-title" id="s3-heading" style="font-size:72px;">
+        你的数字公民人格是<span class="num">哪一种</span>？
+      </h1>
+      
+      <div class="persona-container" id="s3-container">
+        <!-- Personas will be added/animated via JS -->
+      </div>
+
+      <div id="s3-status" style="font-size:28px; font-weight:700; color:var(--dim); opacity:0;">
+        扫描 16 种原型...
+      </div>
+    </div>
+  </div>
+
+  <!-- ====== SCENE 4: CTA ====== -->
+  <div id="s4" class="scene">
+    <div class="scene-content" style="align-items:center; text-align:center;">
+      <div class="accent-line" id="s4-line" style="margin:0 auto;"></div>
+      <h1 class="cta-title" id="s4-title">
+        测测你的<br/><span class="num">数字公民人格</span>
+      </h1>
+      <p class="cta-sub" id="s4-sub">
+        24 道题 · 发现你的<br/>数字公民人格原型
+      </p>
+      <div id="s4-btn-wrap">
+        <div class="cta-button">
+          开始测试 <span>→</span>
+        </div>
+      </div>
+      <div class="url-box" id="s4-url">
+        <div style="width:8px;height:8px;background:var(--accent);border-radius:50%;"></div>
+        persona.putongren.org
+      </div>
+      <div class="brand-line" id="s4-brand">
+        出品：<span>普通人的数字权利</span> 公益社区
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+window.__timelines = window.__timelines || {};
+const tl = gsap.timeline({ paused: true });
+
+const PERSONAS = [
+  { name: "全能委托者", code: "UODP" },
+  { name: "数字顺民", code: "UODR" },
+  { name: "高效公民", code: "UOMP" },
+  { name: "职场工具人", code: "UOMR" },
+  { name: "效用冒险家", code: "UCDP" },
+  { name: "盲从替罪派", code: "UCDR" },
+  { name: "理性利己主义", code: "UCMP" },
+  { name: "焦虑的看守", code: "UCMR" },
+  { name: "隐匿极客", code: "SODP" },
+  { name: "矛盾隐士", code: "SODR" },
+  { name: "审慎建构者", code: "SOMP" },
+  { name: "被动防卫者", code: "SOMR" },
+  { name: "数字主权先锋", code: "SCDP" },
+  { name: "被迫依附者", code: "SCDR" },
+  { name: "隐私卢德派", code: "SCMP" },
+  { name: "宿命论受害者", code: "SCDR" },
+  { name: "?", code: "UNKNOWN" } // The final "?" card
+];
+
+// Setup Scene 3 cards
+const container = document.getElementById("s3-container");
+PERSONAS.forEach((p, i) => {
+  const card = document.createElement("div");
+  card.className = "persona-big-card" + (p.name === "?" ? " is-question" : "");
+  card.id = `p-card-${i}`;
+  card.innerHTML = `
+    <div class="p-dot"></div>
+    <div class="p-name">${p.name}</div>
+    <div class="p-code">${p.name === "?" ? "WHO ARE YOU?" : p.code}</div>
+  `;
+  container.appendChild(card);
+});
+
+// Setup
+tl.set("#s1", { display: "flex" });
+tl.set("#s2, #s3, #s4", { display: "none" });
+
+// S1 (0s -> 2.5s)
+tl.from("#s1-line", { width: 0, duration: 0.3 }, 0.2);
+tl.from("#s1-title", { y: 60, opacity: 0, duration: 0.5 }, 0.3);
+tl.from("#s1-tagline", { y: 40, opacity: 0, duration: 0.5 }, 0.5);
+tl.from("#s1-dot1, #s1-subtitle", { opacity: 0, y: 20, duration: 0.4 }, 0.8);
+
+// Transition 1: Improved S1 -> S2 (Whip Pan Up + Zoom)
+tl.to("#s1-content", { y: -300, opacity: 0, scale: 0.9, blur: "10px", duration: 0.8, ease: "power2.in" }, 2.5);
+tl.set("#s2", { display: "flex" }, 2.5);
+tl.fromTo("#s2", { y: 600, opacity: 0, scale: 1.1 }, { y: 0, opacity: 1, scale: 1, duration: 0.9, ease: "expo.out" }, 2.5);
+tl.set("#s1", { display: "none" }, 3.3);
+
+// S2 (2.5s -> 6.5s)
+tl.from("#s2-label", { y: 30, opacity: 0, duration: 0.4 }, 3.1);
+tl.from("#s2-heading", { y: 40, opacity: 0, duration: 0.5 }, 3.2);
+tl.from(".dim-card", { y: 20, opacity: 0, stagger: 0.1, duration: 0.4 }, 3.4);
+
+// Transition 2
+tl.set("#s3", { display: "flex" }, 6.5);
+tl.from("#s3", { blur: "20px", duration: 0.3 }, 6.5);
+tl.set("#s2", { display: "none" }, 6.6);
+
+// S3 (6.5s -> 10.5s) - Flicker Scan
+tl.from("#s3-label", { scale: 0.8, opacity: 0, duration: 0.4 }, 6.6);
+tl.from("#s3-heading", { y: 20, opacity: 0, duration: 0.5 }, 6.7);
+tl.to("#s3-status", { opacity: 1, duration: 0.3 }, 6.8);
+
+// The Flicker Loop (Slower: 0.18s)
+const flickerSpeed = 0.18;
+PERSONAS.forEach((p, i) => {
+  const startTime = 7.0 + (i * flickerSpeed);
+  // Show card
+  tl.to(`#p-card-${i}`, { opacity: 1, scale: 1, duration: 0.05 }, startTime);
+  // Flash effect
+  tl.to(`#p-card-${i}`, { borderColor: "#fff", duration: 0.05, yoyo: true, repeat: 1 }, startTime);
+  // Hide card (except the last "?")
+  if (i < PERSONAS.length - 1) {
+    tl.to(`#p-card-${i}`, { opacity: 0, scale: 1.1, duration: 0.05 }, startTime + flickerSpeed - 0.02);
+  }
+});
+
+// Final "?" card pulse
+const lastIdx = PERSONAS.length - 1;
+tl.to(`#p-card-${lastIdx}`, { scale: 1.05, duration: 0.4, yoyo: true, repeat: 1, ease: "sine.inOut" }, 7.0 + (lastIdx * flickerSpeed) + 0.1);
+
+// Transition 3
+tl.set("#s4", { display: "flex" }, 10.5);
+tl.fromTo("#s4", { opacity: 0 }, { opacity: 1, duration: 0.5 }, 10.5);
+tl.set("#s3", { display: "none" }, 11.0);
+
+// S4 (10.5s -> 14s)
+tl.from("#s4-line", { width: 0, duration: 0.4 }, 10.7);
+tl.from("#s4-title", { y: 30, opacity: 0, duration: 0.6 }, 10.8);
+tl.from("#s4-sub", { y: 20, opacity: 0, duration: 0.4 }, 11.0);
+tl.from("#s4-btn-wrap", { scale: 0.8, opacity: 0, duration: 0.6, ease: "back.out(1.7)" }, 11.2);
+tl.from("#s4-url, #s4-brand", { y: 20, opacity: 0, stagger: 0.1, duration: 0.4 }, 11.5);
+
+tl.to("#s4-btn-wrap", { scale: 1.05, duration: 0.8, yoyo: true, repeat: 3 }, 12.0);
+
+window.__timelines["promo-v"] = tl;
+</script>
+</body>
+</html>

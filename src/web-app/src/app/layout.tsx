@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "数字灵魂 MBTI - 普通人的数字权利",
+  title: "数字公民人格 MBTI - 普通人的数字权利",
   description: "2026 AI 时代数字公民人格评测系统",
 };
 

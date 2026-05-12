@@ -5,7 +5,7 @@ export default defineAppConfig({
   window: {
     backgroundTextStyle: 'light',
     navigationBarBackgroundColor: '#ffffff',
-    navigationBarTitleText: '数字灵魂 MBTI',
+    navigationBarTitleText: '数字公民人格 MBTI',
     navigationBarTextStyle: 'black'
   }
 })

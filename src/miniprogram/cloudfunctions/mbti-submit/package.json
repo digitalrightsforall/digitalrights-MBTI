@@ -1,0 +1,9 @@
+{
+  "name": "mbti-submit",
+  "version": "1.0.0",
+  "description": "MBTI数据提交到飞书",
+  "main": "index.js",
+  "dependencies": {
+    "wx-server-sdk": "~2.6.3"
+  }
+}

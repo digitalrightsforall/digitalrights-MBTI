@@ -1,4 +1,4 @@
-# 数字灵魂 MBTI (Digital Rights Personality Assessment)
+# 数字公民人格 MBTI (Digital Rights Personality Assessment)
 
 > 2026 AI 时代：你是驯服算法的大师，还是被看光的透明人？
 

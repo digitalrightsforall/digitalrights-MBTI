@@ -1,0 +1,7 @@
+{
+  "weibo": {
+    "template": "我在 2026 AI 时代测出的数字公民人格是：#{{name}}# [{{code}}]！{{slogan}} 你将如何应对这个机器时代，快来测测你的数字公民人格吧！",
+    "url": "https://persona.putongren.org",
+    "hashtags": "数字权利,MBTI,AI2026"
+  }
+}
