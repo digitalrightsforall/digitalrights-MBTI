@@ -18,7 +18,7 @@ export default function Index() {
   useShareAppMessage(() => {
     const persona = (personas as any)[resultCode]
     return {
-      title: step === 'result' ? `我的数字灵魂是：#${persona?.name}#！全球仅 ${persona?.rarity}% 的人拥有此性格。` : '2026 AI 时代：你是驯服算法的大师，还是被看光的透明人？',
+      title: step === 'result' ? `我的数字公民人格是：#${persona?.name}#！全球仅 ${persona?.rarity}% 的人拥有此性格。` : '2026 AI 时代：你是驯服算法的大师，还是被看光的透明人？',
       path: '/pages/index/index'
     }
   })
@@ -27,7 +27,7 @@ export default function Index() {
   useShareTimeline(() => {
     const persona = (personas as any)[resultCode]
     return {
-      title: step === 'result' ? `数字灵魂 MBTI：我是[${persona?.name}]，稀有度 ${persona?.rarity}%` : '数字灵魂 MBTI 评测',
+      title: step === 'result' ? `数字公民人格 MBTI：我是[${persona?.name}]，稀有度 ${persona?.rarity}%` : '数字公民人格 MBTI 评测',
       query: ''
     }
   })
@@ -189,7 +189,7 @@ export default function Index() {
           <View className='logo-box'>
              <View className='logo-icon' />
           </View>
-          <View className='title'>数字灵魂 MBTI</View>
+          <View className='title'>数字公民人格 MBTI</View>
           <Text className='subtitle'>2026 AI 时代：你是哪种数字公民？</Text>
           <Button className='btn-start' onClick={() => setStep('test')}>开启我的档案</Button>
           <View className='brand-footer'>出品：普通人的数字权利社区</View>

@@ -21,7 +21,7 @@ export default function PreviewPage() {
       {/* 顶部设计哲学 */}
       <header style={{ maxWidth: '1000px', margin: '0 auto 80px auto', textAlign: 'center' }}>
         <h1 style={{ fontSize: '3rem', fontWeight: '900', color: '#1e293b', marginBottom: '20px', letterSpacing: '-1px' }}>
-          数字灵魂图腾 <span style={{ color: '#fb923c' }}>Laboratory</span>
+          数字公民人格图腾 <span style={{ color: '#fb923c' }}>Laboratory</span>
         </h1>
         <p style={{ color: '#64748b', fontSize: '1.2rem', marginBottom: '40px' }}>
           将抽象的认知动机，转化为具备生命力的几何符号
@@ -102,7 +102,7 @@ export default function PreviewPage() {
                 <div style={{ position: 'absolute', top: '-10px', left: '15px', background: data.theme_color, padding: '3px', borderRadius: '50%' }}>
                   <Quote size={12} color="#fff" />
                 </div>
-                <h4 style={{ fontSize: '0.85rem', fontWeight: '900', color: data.theme_color, marginBottom: '8px' }}>数字灵魂深度解析</h4>
+                <h4 style={{ fontSize: '0.85rem', fontWeight: '900', color: data.theme_color, marginBottom: '8px' }}>数字公民人格深度解析</h4>
                 <p style={{ color: '#475569', fontSize: '0.85rem', lineHeight: '1.7', textAlign: 'justify' }}>
                   {data.narrative}
                 </p>
