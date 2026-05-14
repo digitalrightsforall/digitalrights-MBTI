@@ -1,0 +1,15 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npx *)",
+      "WebFetch(domain:www.feishu.cn)",
+      "Bash(gh repo *)",
+      "Bash(curl -s \"http://localhost:3002/_next/static/chunks/src_app_page_tsx_0-0lnb2._.js\")",
+      "Bash(git reset *)",
+      "Bash(git checkout *)",
+      "Bash(git clean *)",
+      "Bash(git add *)",
+      "Bash(git commit -m ' *)"
+    ]
+  }
+}
