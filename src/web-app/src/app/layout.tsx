@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Analytics } from '@vercel/analytics/next';
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -19,6 +20,7 @@ export default function RootLayout({
       {/* 增加 suppressHydrationWarning 修复浏览器插件引起的报错 */}
       <body suppressHydrationWarning={true}>
         {children}
+        <Analytics />
       </body>
     </html>
   );
