@@ -46,7 +46,7 @@ export const DetailedReport: React.FC<DetailedReportProps> = ({ code, persona })
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '40px', borderBottom: '2px solid #f1f5f9', paddingBottom: '20px' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
           <Shield size={32} color="#fb923c" />
-          <a href="https://putongren.org" target="_blank" style={{ fontWeight: 900, fontSize: '1.2rem', color: '#1e293b', textDecoration: 'none' }}>普通人的数字权利</a>
+          <span style={{ fontWeight: 900, fontSize: '1.2rem' }}>普通人的数字权利</span>
         </div>
         <div style={{ fontSize: '0.8rem', color: '#94a3b8', fontWeight: 700 }}>
           DIGITAL CITIZEN ARCHIVE / 2026
@@ -118,13 +118,13 @@ export const DetailedReport: React.FC<DetailedReportProps> = ({ code, persona })
       {/* Footer / Call to Action */}
       <div style={{ borderTop: '2px dashed #f1f5f9', paddingTop: '40px', textAlign: 'center' }}>
         <p style={{ fontSize: '1rem', color: '#94a3b8', lineHeight: '1.8', marginBottom: '10px' }}>
-          由「<a href="https://putongren.org" target="_blank" style={{ color: '#94a3b8', textDecoration: 'underline' }}>普通人的数字权利</a>」社区出品。
+          由「普通人的数字权利」社区出品。
         </p>
         <p style={{ fontSize: '1rem', color: '#94a3b8', lineHeight: '1.8', marginBottom: '10px' }}>
           希望了解提升自身的权益素养，参与到更多保护权益的行动中？
         </p>
         <p style={{ fontSize: '1.1rem', color: persona?.theme_color || '#fb923c', fontWeight: 800 }}>
-          访问 <a href="https://putongren.org" target="_blank" style={{ color: persona?.theme_color || '#fb923c', textDecoration: 'underline' }}>putongren.org</a> 了解更多。
+          访问 putongren.org 了解更多。
         </p>
         <div style={{ fontSize: '0.7rem', color: '#cbd5e1', marginTop: '30px' }}>© 2026 普通人的数字权利社区</div>
       </div>
