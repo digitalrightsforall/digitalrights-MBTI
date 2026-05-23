@@ -41,7 +41,7 @@ const downloadPDF = async (elementId: string, filename: string) => {
   pdf.save(filename);
 };
 
-const DynamicIcon = ({ name, size = 24, color = "currentColor" }: { name: string, size?: number, color?: string }) => {
+const DynamicIcon = ({ name, size = 24, color = "currentColor" }: { name: string, size?: number | string, color?: string }) => {
   const IconComponent = (Icons as any)[name] || Shield;
   return <IconComponent size={size} color={color} />;
 };
