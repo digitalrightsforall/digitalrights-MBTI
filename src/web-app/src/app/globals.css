@@ -9,6 +9,16 @@
   --text-dim: #64748b;
   --success: #22c55e;
   --option-hover: #fff7ed;
+  
+  /* 响应式CSS变量 - 动态适配 */
+  --icon-size: clamp(40px, 10vw, 64px);
+  --title-size: clamp(1.8rem, 5vw, 2.4rem);
+  --subtitle-size: clamp(1rem, 3vw, 1.2rem);
+  --padding-lg: clamp(1.5rem, 4vh, 3rem);
+  --padding-md: clamp(1rem, 3vh, 1.5rem);
+  --padding-sm: clamp(0.5rem, 2vh, 1rem);
+  --card-padding: clamp(2rem, 5vh, 3.5rem);
+  --hero-padding: clamp(1.5rem, 4vh, 2.5rem);
 }
 
 * {
@@ -117,4 +127,40 @@ body {
 @keyframes fadeIn {
   from { opacity: 0; transform: translateY(20px); }
   to { opacity: 1; transform: translateY(0); }
+}
+
+/* ==================== 响应式断点 ==================== */
+/* 小屏手机 (< 375px) - iPhone SE 等 */
+@media (max-width: 375px) {
+  .container {
+    padding: 1rem;
+  }
+  
+  .card {
+    padding: 1.5rem;
+  }
+}
+
+/* 中屏手机 (375px - 414px) - iPhone 14/15 等 */
+@media (min-width: 375px) and (max-width: 414px) {
+  .container {
+    padding: 1.25rem;
+  }
+  
+  .card {
+    padding: 2rem;
+  }
+}
+
+/* 大屏手机 (> 414px) - iPhone Pro Max 等 */
+@media (min-width: 414px) {
+  /* 默认样式已经适用 */
+}
+
+/* 超小屏特殊处理 */
+@media (max-height: 667px) {
+  /* 确保首屏能完整显示 */
+  .card {
+    padding: 1.25rem;
+  }
 }
