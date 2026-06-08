@@ -5,7 +5,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 import * as Icons from 'lucide-react';
 import {
   Shield, Zap, Cpu, Activity, RefreshCcw, Heart, Users, Sparkles,
-  Download, Camera, Quote
+  Download, Camera, Quote, Check, BookOpen, ArrowRight, ExternalLink,
+  MessageCircle, PenTool, Users as UsersIcon
 } from 'lucide-react';
 import { Radar, RadarChart, PolarGrid, PolarAngleAxis, ResponsiveContainer, Radar as RadarLine } from 'recharts';
 import questions from '@/data/questions.json';
@@ -80,6 +81,25 @@ export default function Home() {
   const [dimensionScores, setDimensionScores] = useState<Record<string, number>>({});
   const [participantId, setParticipantId] = useState<string>('');
   const [isDownloading, setIsDownloading] = useState(false);
+  const [completedActions, setCompletedActions] = useState<Set<string>>(new Set());
+
+  useEffect(() => {
+    const saved = localStorage.getItem(`completed_actions_${resultCode}`);
+    if (saved) {
+      setCompletedActions(new Set(JSON.parse(saved)));
+    }
+  }, [resultCode]);
+
+  const toggleAction = (actionId: string) => {
+    const newCompleted = new Set(completedActions);
+    if (newCompleted.has(actionId)) {
+      newCompleted.delete(actionId);
+    } else {
+      newCompleted.add(actionId);
+    }
+    setCompletedActions(newCompleted);
+    localStorage.setItem(`completed_actions_${resultCode}`, JSON.stringify([...newCompleted]));
+  };
 
   useEffect(() => {
     let pid = localStorage.getItem('mbti_participant_id');
@@ -345,6 +365,203 @@ export default function Home() {
                         </div>
                       );
                     })}
+                  </div>
+                </div>
+
+                {/* 3. 你的数字行动清单 */}
+                <div style={{ marginBottom: '2.5rem' }}>
+                  <h3 style={{ fontSize: '1rem', fontWeight: '900', marginBottom: '1.2rem', color: '#1e293b', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <Sparkles size={18} color={currentPersona?.theme_color} /> 你的数字行动清单
+                    <span style={{ fontSize: '0.8rem', fontWeight: '600', color: '#94a3b8', marginLeft: 'auto' }}>
+                      {completedActions.size}/{currentPersona?.actions?.length || 0} 完成
+                    </span>
+                  </h3>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '0.8rem' }}>
+                    {currentPersona?.actions?.map((action: any) => (
+                      <motion.div 
+                        key={action.id}
+                        onClick={() => toggleAction(action.id)}
+                        whileTap={{ scale: 0.98 }}
+                        style={{ 
+                          padding: '1rem 1.2rem', 
+                          background: completedActions.has(action.id) ? 'rgba(34, 197, 94, 0.1)' : '#f8fafc', 
+                          borderRadius: '16px', 
+                          border: completedActions.has(action.id) ? '1px solid rgba(34, 197, 94, 0.3)' : '1px solid #f1f5f9',
+                          cursor: 'pointer',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '10px'
+                        }}
+                      >
+                        <div style={{ 
+                          width: '22px', 
+                          height: '22px', 
+                          borderRadius: '50%',
+                          border: completedActions.has(action.id) ? '2px solid #22c55e' : '2px solid #cbd5e1',
+                          background: completedActions.has(action.id) ? '#22c55e' : 'transparent',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          flexShrink: 0
+                        }}>
+                          {completedActions.has(action.id) && <Check size={12} color="#fff" />}
+                        </div>
+                        <div style={{ flexGrow: 1 }}>
+                          <div style={{ fontWeight: '800', fontSize: '0.9rem', color: '#1e293b' }}>{action.text}</div>
+                          <div style={{ fontSize: '0.75rem', color: '#94a3b8', marginTop: '2px' }}>{action.duration}</div>
+                        </div>
+                        {completedActions.has(action.id) && (
+                          <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }}>
+                            <span style={{ color: '#22c55e', fontSize: '0.75rem', fontWeight: '700' }}>已完成</span>
+                          </motion.div>
+                        )}
+                      </motion.div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* 4. 内容推荐 */}
+                <div style={{ marginBottom: '2.5rem' }}>
+                  <h3 style={{ fontSize: '1rem', fontWeight: '900', marginBottom: '1.2rem', color: '#1e293b', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <BookOpen size={18} color={currentPersona?.theme_color} /> 为你推荐
+                  </h3>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                    {currentPersona?.content_primary && (
+                      <a 
+                        href={currentPersona.content_primary.link} 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        style={{ 
+                          padding: '1rem 1.2rem', 
+                          background: '#f8fafc', 
+                          borderRadius: '16px', 
+                          border: '1px solid #f1f5f9',
+                          textDecoration: 'none',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '10px'
+                        }}
+                      >
+                        <div style={{ 
+                          width: '40px', 
+                          height: '40px', 
+                          borderRadius: '12px',
+                          background: currentPersona.theme_color,
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          flexShrink: 0
+                        }}>
+                          <BookOpen size={18} color="#fff" />
+                        </div>
+                        <div style={{ flexGrow: 1 }}>
+                          <div style={{ fontWeight: '800', fontSize: '0.9rem', color: '#1e293b' }}>{currentPersona.content_primary.title}</div>
+                          <div style={{ fontSize: '0.75rem', color: '#64748b', marginTop: '4px', lineHeight: '1.5' }}>{currentPersona.content_primary.reason}</div>
+                        </div>
+                        <ExternalLink size={16} color="#94a3b8" />
+                      </a>
+                    )}
+                    {currentPersona?.content_secondary && (
+                      <a 
+                        href={currentPersona.content_secondary.link} 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        style={{ 
+                          padding: '1rem 1.2rem', 
+                          background: '#fff', 
+                          borderRadius: '16px', 
+                          border: '1px solid #f1f5f9',
+                          textDecoration: 'none',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '10px'
+                        }}
+                      >
+                        <div style={{ 
+                          width: '40px', 
+                          height: '40px', 
+                          borderRadius: '12px',
+                          background: '#e2e8f0',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          flexShrink: 0
+                        }}>
+                          <BookOpen size={18} color="#64748b" />
+                        </div>
+                        <div style={{ flexGrow: 1 }}>
+                          <div style={{ fontWeight: '700', fontSize: '0.85rem', color: '#475569' }}>{currentPersona.content_secondary.title}</div>
+                          <div style={{ fontSize: '0.7rem', color: '#94a3b8', marginTop: '4px', lineHeight: '1.5' }}>{currentPersona.content_secondary.reason}</div>
+                        </div>
+                        <ExternalLink size={14} color="#cbd5e1" />
+                      </a>
+                    )}
+                  </div>
+                </div>
+
+                {/* 5. 加入社区 */}
+                <div style={{ marginBottom: '2.5rem' }}>
+                  <h3 style={{ fontSize: '1rem', fontWeight: '900', marginBottom: '1.2rem', color: '#1e293b', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <UsersIcon size={18} color={currentPersona?.theme_color} /> 加入社区
+                  </h3>
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '0.8rem' }}>
+                    <a 
+                      href="https://putongren.org/roundtable" 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      style={{ 
+                        padding: '1rem 0.6rem', 
+                        background: '#f8fafc', 
+                        borderRadius: '16px', 
+                        border: '1px solid #f1f5f9',
+                        textDecoration: 'none',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: 'center',
+                        gap: '6px'
+                      }}
+                    >
+                      <MessageCircle size={20} color={currentPersona?.theme_color} />
+                      <span style={{ fontSize: '0.75rem', fontWeight: '700', color: '#475569', textAlign: 'center' }}>圆桌派</span>
+                    </a>
+                    <a 
+                      href="https://putongren.org/cocreation" 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      style={{ 
+                        padding: '1rem 0.6rem', 
+                        background: '#f8fafc', 
+                        borderRadius: '16px', 
+                        border: '1px solid #f1f5f9',
+                        textDecoration: 'none',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: 'center',
+                        gap: '6px'
+                      }}
+                    >
+                      <PenTool size={20} color={currentPersona?.theme_color} />
+                      <span style={{ fontSize: '0.75rem', fontWeight: '700', color: '#475569', textAlign: 'center' }}>共创营</span>
+                    </a>
+                    <a 
+                      href="https://putongren.org/play" 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      style={{ 
+                        padding: '1rem 0.6rem', 
+                        background: '#f8fafc', 
+                        borderRadius: '16px', 
+                        border: '1px solid #f1f5f9',
+                        textDecoration: 'none',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: 'center',
+                        gap: '6px'
+                      }}
+                    >
+                      <Cpu size={20} color={currentPersona?.theme_color} />
+                      <span style={{ fontSize: '0.75rem', fontWeight: '700', color: '#475569', textAlign: 'center' }}>Play</span>
+                    </a>
                   </div>
                 </div>
 
